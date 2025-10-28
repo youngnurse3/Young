@@ -5,6 +5,7 @@ import Header from './components/Header';
 import AddItemForm from './components/AddItemForm';
 import StockList from './components/StockList';
 import WeeklySummary from './components/WeeklySummary';
+import DashboardMetrics from './components/DashboardMetrics';
 
 const App: React.FC = () => {
   const [stockItems, setStockItems] = useState<StockItem[]>(() => {
@@ -48,11 +49,12 @@ const App: React.FC = () => {
     }
   }, [transactions]);
 
-  const handleAddItem = (name: string, quantity: number) => {
+  const handleAddItem = (name: string, quantity: number, lowStockThreshold?: number) => {
     const newItem: StockItem = {
       id: crypto.randomUUID(),
       name,
       quantity,
+      lowStockThreshold,
     };
     const newTransaction: Transaction = {
       id: crypto.randomUUID(),
@@ -91,17 +93,32 @@ const App: React.FC = () => {
   
   const handleRemoveItem = (itemId: string) => {
     setStockItems(prevItems => prevItems.filter(item => item.id !== itemId));
-    // We keep transactions for historical data
+    // Also remove all transactions associated with this item
+    setTransactions(prevTransactions => prevTransactions.filter(trans => trans.itemId !== itemId));
+  };
+
+  const handleSetThreshold = (itemId: string, threshold: number | undefined) => {
+    setStockItems(prevItems =>
+      prevItems.map(item =>
+        item.id === itemId ? { ...item, lowStockThreshold: threshold } : item
+      )
+    );
   };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
       <Header />
       <main className="container mx-auto p-4 md:p-8 max-w-7xl">
+        <DashboardMetrics items={stockItems} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <AddItemForm onAddItem={handleAddItem} />
-            <StockList items={stockItems} onUpdateQuantity={handleUpdateQuantity} onRemoveItem={handleRemoveItem}/>
+            <StockList 
+              items={stockItems} 
+              onUpdateQuantity={handleUpdateQuantity} 
+              onRemoveItem={handleRemoveItem}
+              onSetThreshold={handleSetThreshold}
+            />
           </div>
           <div className="lg:col-span-1">
             <WeeklySummary transactions={transactions} stockItems={stockItems} />

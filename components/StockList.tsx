@@ -7,9 +7,10 @@ interface StockListProps {
   items: StockItem[];
   onUpdateQuantity: (itemId: string, type: TransactionType.REFILL | TransactionType.WITHDRAW, amount: number) => void;
   onRemoveItem: (itemId: string) => void;
+  onSetThreshold: (itemId: string, threshold: number | undefined) => void;
 }
 
-const StockList: React.FC<StockListProps> = ({ items, onUpdateQuantity, onRemoveItem }) => {
+const StockList: React.FC<StockListProps> = ({ items, onUpdateQuantity, onRemoveItem, onSetThreshold }) => {
   return (
     <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl shadow-lg">
       <h2 className="text-xl font-bold mb-4 text-slate-700 dark:text-slate-200">รายการสินค้าในคลัง</h2>
@@ -19,7 +20,7 @@ const StockList: React.FC<StockListProps> = ({ items, onUpdateQuantity, onRemove
             <thead className="border-b border-slate-200 dark:border-slate-700">
               <tr>
                 <th className="p-4 text-sm font-semibold text-slate-500 dark:text-slate-400">ชื่อสินค้า</th>
-                <th className="p-4 text-sm font-semibold text-slate-500 dark:text-slate-400 text-center">คงเหลือ</th>
+                <th className="p-4 text-sm font-semibold text-slate-500 dark:text-slate-400 text-center">จำนวน / สถานะ</th>
                 <th className="p-4 text-sm font-semibold text-slate-500 dark:text-slate-400 min-w-[300px]">จัดการสต็อก</th>
                 <th className="p-4 text-sm font-semibold text-slate-500 dark:text-slate-400 text-center">ลบ</th>
               </tr>
@@ -31,6 +32,7 @@ const StockList: React.FC<StockListProps> = ({ items, onUpdateQuantity, onRemove
                   item={item} 
                   onUpdateQuantity={onUpdateQuantity}
                   onRemoveItem={onRemoveItem}
+                  onSetThreshold={onSetThreshold}
                 />
               ))}
             </tbody>
